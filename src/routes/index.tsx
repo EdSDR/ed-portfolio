@@ -114,93 +114,86 @@ function RouteComponent() {
 	}, [progress]);
 
 	return (
-		<main>
-			<motion.div className="flex flex-1">
-				<div className="flex-1 flex justify-center px-6 py-[15vh] overflow-y-auto">
-					<LayoutGroup>
-						<motion.div
-							layout
-							className="relative flex flex-col items-start w-full md:w-auto max-w-md md:max-w-none"
-							transition={NAME_WRAPPER_SPRING_CONFIG}
-						>
-							{/* {expanded ? <Spotify /> : null} */}
-							<motion.h1
-								layout
-								ref={ref}
-								className="font-bold whitespace-nowrap will-change-transform"
-								style={{ fontSize: fontSizeRem }}
-							>
-								Ed Castro
-							</motion.h1>
+		<motion.div className="flex flex-1 justify-center px-6 py-[15vh] overflow-y-auto overflow-hidden">
+			<LayoutGroup>
+				<motion.div
+					layout
+					className="relative flex flex-col items-start w-full md:w-auto max-w-md md:max-w-none"
+					transition={NAME_WRAPPER_SPRING_CONFIG}
+				>
+					{/* {expanded ? <Spotify /> : null} */}
+					<motion.h1
+						layout
+						ref={ref}
+						className="font-bold whitespace-nowrap will-change-transform"
+						style={{ fontSize: fontSizeRem }}
+					>
+						Ed Castro
+					</motion.h1>
 
-							{expanded ? (
-								<>
-									<AnimatedText
-										text="software engineer & designer"
-										element="p"
-									/>
+					{expanded ? (
+						<>
+							<AnimatedText text="software engineer & designer" element="p" />
 
-									<div className="flex items-center gap-2 mt-1">
-										{SOCIALS.map((social, i) => (
-											<motion.a
-												key={social.label}
-												href={social.href}
-												target="_blank"
-												rel="noopener noreferrer"
-												aria-label={social.label}
-												className="text-stone-400 hover:text-stone-600 transition-colors"
-												initial={SOCIAL_ANIMATION.initial}
-												animate={SOCIAL_ANIMATION.animate}
-												transition={{
-													...SOCIAL_ANIMATION.transition,
-													delay: 0.3 + i * 0.1,
-												}}
-											>
-												{SOCIAL_ICONS[social.label]}
-											</motion.a>
-										))}
-									</div>
-
-									<Home />
-								</>
-							) : null}
-
-							<noscript>
-								<p>software engineer & designer</p>
-								<nav>
-									{SOCIALS.map((social) => (
-										<a key={social.label} href={social.href}>
-											{social.label}
-										</a>
-									))}
-								</nav>
-
-								<h2>work</h2>
-								{WORK_ITEMS.map((item) => (
-									<div key={item.slug}>
-										<a href={item.url}>
-											<strong>{item.company}</strong> — {item.role}
-										</a>
-										<p>{item.about}</p>
-										<span>{item.date}</span>
-									</div>
+							<div className="flex items-center gap-2 mt-1">
+								{SOCIALS.map((social, i) => (
+									<motion.a
+										key={social.label}
+										href={social.href}
+										target="_blank"
+										rel="noopener noreferrer"
+										aria-label={social.label}
+										className="text-stone-400 hover:text-stone-600 transition-colors"
+										initial={SOCIAL_ANIMATION.initial}
+										animate={SOCIAL_ANIMATION.animate}
+										transition={{
+											...SOCIAL_ANIMATION.transition,
+											delay: 0.3 + i * 0.1,
+										}}
+									>
+										{SOCIAL_ICONS[social.label]}
+									</motion.a>
 								))}
+							</div>
 
-								<h2>projects</h2>
-								{PROJECTS.map((project) => (
-									<div key={project.slug}>
-										<a href={project.url}>
-											<strong>{project.name}</strong> — {project.role}
-										</a>
-										<p>{project.about}</p>
-									</div>
-								))}
-							</noscript>
-						</motion.div>
-					</LayoutGroup>
-				</div>
-			</motion.div>
-		</main>
+							<Home />
+						</>
+					) : null}
+
+					<noscript>
+						<p>Software Engineer & designer</p>
+						<nav>
+							{SOCIALS.map((social) => (
+								<a key={social.label} href={social.href}>
+									{social.label}
+								</a>
+							))}
+						</nav>
+
+						<h2>Work</h2>
+						{WORK_ITEMS.map((item) => (
+							<div key={item.slug}>
+								<a href={item.url}>
+									<strong>{item.company}</strong> — {item.role}
+								</a>
+								<p>{item.about}</p>
+								<span>{item.date}</span>
+							</div>
+						))}
+
+						<h2>Projects</h2>
+						{PROJECTS.map((project) => (
+							<div key={project.slug}>
+								<a href={project.url}>
+									<strong>{project.name}</strong> — {project.role}
+								</a>
+								<p>{project.about}</p>
+							</div>
+						))}
+					</noscript>
+				</motion.div>
+			</LayoutGroup>
+		</motion.div>
 	);
 }
 
@@ -376,7 +369,8 @@ export default function Home() {
 				artificialDelay={0.3}
 			/>
 
-			<div
+			<button
+				type="button"
 				className="flex flex-col gap-3 mt-3"
 				onMouseLeave={clearProjectHover}
 			>
@@ -395,7 +389,7 @@ export default function Home() {
 						onHover={handleProjectHover}
 					/>
 				))}
-			</div>
+			</button>
 
 			<div className="hidden md:block">
 				<HoverPreview

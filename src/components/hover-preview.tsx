@@ -38,7 +38,7 @@ export function HoverPreview({
 			{isVisible ? (
 				<motion.div
 					layoutId="hover-preview"
-					className="w-[320] fixed z-50 pointer-events-none overflow-hidden rounded-lg border border-stone-300/50 shadow-lg bg-stone-200"
+					className="w-96 fixed z-50 pointer-events-none overflow-hidden rounded-lg border border-stone-300/50 shadow-lg bg-stone-200"
 					style={{
 						top: anchorRect.top,
 						left: anchorRect.right + 12,
@@ -53,7 +53,7 @@ export function HoverPreview({
 						key={previewUrl}
 						src={previewUrl}
 						alt=""
-						className="w-full block aspect-16/10 object-cover"
+						className="w-full block aspect-16/9 object-cover"
 					/>
 				</motion.div>
 			) : null}

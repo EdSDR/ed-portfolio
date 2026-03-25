@@ -38,7 +38,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 				<script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
 				<HeadContent />
 			</head>
-			<body className="font-sans antialiased [overflow-wrap:anywhere] selection:bg-stone-200">
+			<body className="font-sans antialiased [overflow-wrap:anywhere]">
 				{children}
 				<TanStackDevtools
 					config={{
