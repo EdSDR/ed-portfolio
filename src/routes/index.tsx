@@ -1,87 +1,410 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute } from "@tanstack/react-router";
+import {
+	LayoutGroup,
+	type MotionNodeAnimationOptions,
+	motion,
+	type Transition,
+	useMotionValue,
+	useMotionValueEvent,
+	useSpring,
+	useTransform,
+} from "motion/react";
+import { memo, useCallback, useEffect, useRef, useState } from "react";
+import { AnimatedText } from "#/components/animated-text";
+import { HoverPreview } from "#/components/hover-preview";
+import { GitHubIcon, LinkedInIcon, XIcon } from "#/components/icons";
+import { PROJECTS, SOCIALS, WORK_ITEMS } from "#/utils/constants";
+import { getPreviewUrl } from "#/utils/get-preview-url";
 
-export const Route = createFileRoute('/')({ component: App })
+export const Route = createFileRoute("/")({
+	component: RouteComponent,
+});
 
-function App() {
-  return (
-    <main className="page-wrap px-4 pb-8 pt-14">
-      <section className="island-shell rise-in relative overflow-hidden rounded-[2rem] px-6 py-10 sm:px-10 sm:py-14">
-        <div className="pointer-events-none absolute -left-20 -top-24 h-56 w-56 rounded-full bg-[radial-gradient(circle,rgba(79,184,178,0.32),transparent_66%)]" />
-        <div className="pointer-events-none absolute -bottom-20 -right-20 h-56 w-56 rounded-full bg-[radial-gradient(circle,rgba(47,106,74,0.18),transparent_66%)]" />
-        <p className="island-kicker mb-3">TanStack Start Base Template</p>
-        <h1 className="display-title mb-5 max-w-3xl text-4xl leading-[1.02] font-bold tracking-tight text-[var(--sea-ink)] sm:text-6xl">
-          Start simple, ship quickly.
-        </h1>
-        <p className="mb-8 max-w-2xl text-base text-[var(--sea-ink-soft)] sm:text-lg">
-          This base starter intentionally keeps things light: two routes, clean
-          structure, and the essentials you need to build from scratch.
-        </p>
-        <div className="flex flex-wrap gap-3">
-          <a
-            href="/about"
-            className="rounded-full border border-[rgba(50,143,151,0.3)] bg-[rgba(79,184,178,0.14)] px-5 py-2.5 text-sm font-semibold text-[var(--lagoon-deep)] no-underline transition hover:-translate-y-0.5 hover:bg-[rgba(79,184,178,0.24)]"
-          >
-            About This Starter
-          </a>
-          <a
-            href="https://tanstack.com/router"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="rounded-full border border-[rgba(23,58,64,0.2)] bg-white/50 px-5 py-2.5 text-sm font-semibold text-[var(--sea-ink)] no-underline transition hover:-translate-y-0.5 hover:border-[rgba(23,58,64,0.35)]"
-          >
-            Router Guide
-          </a>
-        </div>
-      </section>
+const NAME_WRAPPER_SPRING_CONFIG = {
+	type: "spring",
+	stiffness: 80,
+	damping: 20,
+} as const satisfies Transition;
 
-      <section className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {[
-          [
-            'Type-Safe Routing',
-            'Routes and links stay in sync across every page.',
-          ],
-          [
-            'Server Functions',
-            'Call server code from your UI without creating API boilerplate.',
-          ],
-          [
-            'Streaming by Default',
-            'Ship progressively rendered responses for faster experiences.',
-          ],
-          [
-            'Tailwind Native',
-            'Design quickly with utility-first styling and reusable tokens.',
-          ],
-        ].map(([title, desc], index) => (
-          <article
-            key={title}
-            className="island-shell feature-card rise-in rounded-2xl p-5"
-            style={{ animationDelay: `${index * 90 + 80}ms` }}
-          >
-            <h2 className="mb-2 text-base font-semibold text-[var(--sea-ink)]">
-              {title}
-            </h2>
-            <p className="m-0 text-sm text-[var(--sea-ink-soft)]">{desc}</p>
-          </article>
-        ))}
-      </section>
+const NAME_SPRING_CONFIG = {
+	stiffness: 30,
+	damping: 15,
+	mass: 3,
+} as const satisfies Transition;
 
-      <section className="island-shell mt-8 rounded-2xl p-6">
-        <p className="island-kicker mb-2">Quick Start</p>
-        <ul className="m-0 list-disc space-y-2 pl-5 text-sm text-[var(--sea-ink-soft)]">
-          <li>
-            Edit <code>src/routes/index.tsx</code> to customize the home page.
-          </li>
-          <li>
-            Update <code>src/components/Header.tsx</code> and{' '}
-            <code>src/components/Footer.tsx</code> for brand links.
-          </li>
-          <li>
-            Add routes in <code>src/routes</code> and tweak visual tokens in{' '}
-            <code>src/styles.css</code>.
-          </li>
-        </ul>
-      </section>
-    </main>
-  )
+const SOCIAL_ANIMATION = {
+	initial: {
+		opacity: 0,
+		y: 5,
+		filter: "blur(4px)",
+	},
+	animate: {
+		opacity: 1,
+		y: 0,
+		filter: "blur(0px)",
+	},
+	transition: {
+		duration: 1,
+		ease: [0.2, 0.65, 0.3, 0.9],
+	},
+} as const satisfies MotionNodeAnimationOptions;
+
+const SOCIAL_ICONS: Record<string, React.ReactNode> = {
+	GitHub: <GitHubIcon />,
+	X: <XIcon />,
+	LinkedIn: <LinkedInIcon />,
+};
+
+const ANIMATION_STEPS = [
+	{ font: "Redaction 100", weight: 700, size: 16 },
+	{ font: "Redaction 10", weight: 400, size: 13 },
+	{ font: "Redaction 70", weight: 700, size: 10 },
+	{ font: "Redaction", weight: 400, size: 8 },
+	{ font: "Redaction 35", weight: 700, size: 6.5 },
+	{ font: "Redaction 100", weight: 400, size: 5.2 },
+	{ font: "Redaction 20", weight: 400, size: 4.2 },
+	{ font: "Redaction 50", weight: 700, size: 3.75 },
+] as const satisfies Array<{
+	font: string;
+	weight: number;
+	size: number;
+}>;
+
+const STEP_INDICES = ANIMATION_STEPS.map((_, i) => i);
+const STEP_SIZES = ANIMATION_STEPS.map((s) => s.size);
+const LAST_STEP = ANIMATION_STEPS.length - 1;
+
+function RouteComponent() {
+	const ref = useRef<HTMLHeadingElement>(null);
+	const progress = useMotionValue(0);
+	const spring = useSpring(progress, NAME_SPRING_CONFIG);
+	const [expanded, setExpanded] = useState(false);
+
+	const fontSize = useTransform(spring, STEP_INDICES, STEP_SIZES);
+	const fontSizeRem = useTransform(
+		fontSize,
+		(v) =>
+			`clamp(${(v * 0.3).toFixed(2)}rem, ${(v * 3.5).toFixed(2)}vw, ${v}rem)`,
+	);
+
+	useMotionValueEvent(spring, "change", (v) => {
+		if (!ref.current) {
+			return;
+		}
+
+		const i = Math.max(0, Math.min(Math.round(v), LAST_STEP));
+		ref.current.style.setProperty(
+			"font-family",
+			`"${ANIMATION_STEPS[i].font}"`,
+			"important",
+		);
+		ref.current.style.setProperty(
+			"font-weight",
+			String(ANIMATION_STEPS[i].weight),
+			"important",
+		);
+
+		if (v > LAST_STEP) {
+			setExpanded(true);
+		}
+	});
+
+	useEffect(() => {
+		progress.set(LAST_STEP);
+	}, [progress]);
+
+	return (
+		<main>
+			<motion.div className="flex flex-1">
+				<div className="flex-1 flex justify-center px-6 py-[15vh] overflow-y-auto">
+					<LayoutGroup>
+						<motion.div
+							layout
+							className="relative flex flex-col items-start w-full md:w-auto max-w-md md:max-w-none"
+							transition={NAME_WRAPPER_SPRING_CONFIG}
+						>
+							{/* {expanded ? <Spotify /> : null} */}
+							<motion.h1
+								layout
+								ref={ref}
+								className="font-bold whitespace-nowrap will-change-transform"
+								style={{ fontSize: fontSizeRem }}
+							>
+								Ed Castro
+							</motion.h1>
+
+							{expanded ? (
+								<>
+									<AnimatedText
+										text="software engineer & designer"
+										element="p"
+									/>
+
+									<div className="flex items-center gap-2 mt-1">
+										{SOCIALS.map((social, i) => (
+											<motion.a
+												key={social.label}
+												href={social.href}
+												target="_blank"
+												rel="noopener noreferrer"
+												aria-label={social.label}
+												className="text-stone-400 hover:text-stone-600 transition-colors"
+												initial={SOCIAL_ANIMATION.initial}
+												animate={SOCIAL_ANIMATION.animate}
+												transition={{
+													...SOCIAL_ANIMATION.transition,
+													delay: 0.3 + i * 0.1,
+												}}
+											>
+												{SOCIAL_ICONS[social.label]}
+											</motion.a>
+										))}
+									</div>
+
+									<Home />
+								</>
+							) : null}
+
+							<noscript>
+								<p>software engineer & designer</p>
+								<nav>
+									{SOCIALS.map((social) => (
+										<a key={social.label} href={social.href}>
+											{social.label}
+										</a>
+									))}
+								</nav>
+
+								<h2>work</h2>
+								{WORK_ITEMS.map((item) => (
+									<div key={item.slug}>
+										<a href={item.url}>
+											<strong>{item.company}</strong> — {item.role}
+										</a>
+										<p>{item.about}</p>
+										<span>{item.date}</span>
+									</div>
+								))}
+
+								<h2>projects</h2>
+								{PROJECTS.map((project) => (
+									<div key={project.slug}>
+										<a href={project.url}>
+											<strong>{project.name}</strong> — {project.role}
+										</a>
+										<p>{project.about}</p>
+									</div>
+								))}
+							</noscript>
+						</motion.div>
+					</LayoutGroup>
+				</div>
+			</motion.div>
+		</main>
+	);
+}
+
+type HoverState = {
+	id: string;
+	rect: DOMRect;
+	previewUrl: string;
+} | null;
+
+const ITEM_ANIMATION = {
+	initial: {
+		opacity: 0,
+		y: 5,
+		filter: "blur(4px)",
+	},
+	animate: {
+		opacity: 1,
+		y: 0,
+		filter: "blur(0px)",
+	},
+	transition: {
+		duration: 1,
+		ease: [0.2, 0.65, 0.3, 0.9],
+	},
+} as const satisfies MotionNodeAnimationOptions;
+
+const ITEM_HOVER_TRANSITION = {
+	type: "spring",
+	stiffness: 400,
+	damping: 30,
+} as const satisfies Transition;
+
+// precompute preview urls since items are static
+const WORK_PREVIEW_URLS = new Map(
+	WORK_ITEMS.map((item) => [item.slug, getPreviewUrl(item) ?? ""]),
+);
+const PROJECT_PREVIEW_URLS = new Map(
+	PROJECTS.map((item) => [item.slug, getPreviewUrl(item) ?? ""]),
+);
+
+type ItemRowProps = {
+	id: string;
+	label: string;
+	role: string;
+	about: string;
+	date?: string;
+	url: string;
+	isHovered: boolean;
+	layoutId: string;
+	delay: number;
+	previewUrl: string;
+	onHover: (id: string, previewUrl: string, rect: DOMRect) => void;
+};
+
+const ItemRow = memo(function ItemRow({
+	id,
+	label,
+	role,
+	about,
+	date,
+	url,
+	isHovered,
+	layoutId,
+	delay,
+	previewUrl,
+	onHover,
+}: ItemRowProps) {
+	const handleMouseEnter = useCallback(
+		(e: React.MouseEvent) => {
+			onHover(id, previewUrl, e.currentTarget.getBoundingClientRect());
+		},
+		[onHover, id, previewUrl],
+	);
+
+	return (
+		<a href={url} target="_blank" rel="noopener noreferrer">
+			<motion.div
+				className="relative flex flex-col items-start will-change-transform -mx-2 px-2 -my-1 py-1 text-left"
+				initial={ITEM_ANIMATION.initial}
+				animate={ITEM_ANIMATION.animate}
+				transition={{
+					...ITEM_ANIMATION.transition,
+					delay,
+				}}
+				onMouseEnter={handleMouseEnter}
+			>
+				{isHovered ? (
+					<motion.div
+						layoutId={layoutId}
+						className="absolute inset-0 bg-stone-300/30 border border-stone-300/50 rounded-md"
+						transition={ITEM_HOVER_TRANSITION}
+					/>
+				) : null}
+
+				<div className="relative flex items-baseline justify-between gap-2 sm:gap-8 w-full">
+					<div className="flex items-baseline gap-2 min-w-0">
+						<span className="font-bold text-stone-700 truncate">{label}</span>
+						<span className="text-sm text-stone-500 hidden sm:inline">
+							{role}
+						</span>
+					</div>
+					{date ? (
+						<span className="text-sm text-stone-400 whitespace-nowrap hidden sm:inline">
+							{date}
+						</span>
+					) : null}
+				</div>
+
+				<span className="relative text-xs text-stone-500 sm:hidden">
+					{role}
+				</span>
+
+				<span className="relative text-xs text-stone-600">{about}</span>
+				<img src={previewUrl} alt="" className="hidden" fetchPriority="low" />
+			</motion.div>
+		</a>
+	);
+});
+
+export default function Home() {
+	const [hoveredWork, setHoveredWork] = useState<HoverState>(null);
+	const [hoveredProject, setHoveredProject] = useState<HoverState>(null);
+
+	const handleWorkHover = useCallback(
+		(id: string, previewUrl: string, rect: DOMRect) => {
+			setHoveredWork({ id, rect, previewUrl });
+		},
+		[],
+	);
+
+	const handleProjectHover = useCallback(
+		(id: string, previewUrl: string, rect: DOMRect) => {
+			setHoveredProject({ id, rect, previewUrl });
+		},
+		[],
+	);
+
+	const clearWorkHover = useCallback(() => setHoveredWork(null), []);
+	const clearProjectHover = useCallback(() => setHoveredProject(null), []);
+
+	return (
+		<>
+			<AnimatedText
+				className="text-xl mt-4 font-bold"
+				element="h2"
+				text="work"
+				artificialDelay={0.3}
+			/>
+
+			<div className="flex flex-col gap-3 mt-3" onMouseLeave={clearWorkHover}>
+				{WORK_ITEMS.map((item, i) => (
+					<ItemRow
+						key={item.slug}
+						id={item.company}
+						label={item.company}
+						role={item.role}
+						about={item.about}
+						date={item.date}
+						url={item.url}
+						isHovered={hoveredWork?.id === item.company}
+						layoutId="work-hover"
+						delay={0.5 + i * 0.15}
+						previewUrl={WORK_PREVIEW_URLS.get(item.slug) ?? ""}
+						onHover={handleWorkHover}
+					/>
+				))}
+			</div>
+
+			<AnimatedText
+				className="text-xl mt-4 font-bold"
+				element="h2"
+				text="projects"
+				artificialDelay={0.3}
+			/>
+
+			<div
+				className="flex flex-col gap-3 mt-3"
+				onMouseLeave={clearProjectHover}
+			>
+				{PROJECTS.map((project, i) => (
+					<ItemRow
+						key={project.slug}
+						id={project.name}
+						label={project.name}
+						role={project.role}
+						about={project.about}
+						url={project.url}
+						isHovered={hoveredProject?.id === project.name}
+						layoutId="project-hover"
+						delay={0.5 + i * 0.15}
+						previewUrl={PROJECT_PREVIEW_URLS.get(project.slug) ?? ""}
+						onHover={handleProjectHover}
+					/>
+				))}
+			</div>
+
+			<div className="hidden md:block">
+				<HoverPreview
+					previewUrl={
+						hoveredWork?.previewUrl || hoveredProject?.previewUrl || null
+					}
+					anchorRect={hoveredWork?.rect || hoveredProject?.rect || null}
+				/>
+			</div>
+		</>
+	);
 }
