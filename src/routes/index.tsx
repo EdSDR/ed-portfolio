@@ -63,7 +63,7 @@ const ANIMATION_STEPS = [
 	{ font: "Redaction 35", weight: 700, size: 6.5 },
 	{ font: "Redaction 100", weight: 400, size: 5.2 },
 	{ font: "Redaction 20", weight: 400, size: 4.2 },
-	{ font: "Redaction 50", weight: 700, size: 3.75 },
+	{ font: "Playfair Display Variable", weight: 700, size: 3.75 },
 ] as const satisfies Array<{
 	font: string;
 	weight: number;
@@ -337,7 +337,7 @@ export default function Home() {
 	return (
 		<>
 			<AnimatedText
-				className="text-xl mt-4 font-bold"
+				className="text-xl mt-4 font-bold font-serif"
 				element="h2"
 				text="work"
 				artificialDelay={0.3}
@@ -363,7 +363,7 @@ export default function Home() {
 			</div>
 
 			<AnimatedText
-				className="text-xl mt-4 font-bold"
+				className="text-xl mt-4 font-bold font-serif"
 				element="h2"
 				text="projects"
 				artificialDelay={0.3}

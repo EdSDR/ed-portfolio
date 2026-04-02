@@ -5,14 +5,21 @@ import viteReact from "@vitejs/plugin-react";
 import { defineConfig } from "vite";
 import tsconfigPaths from "vite-tsconfig-paths";
 
+import { cloudflare } from "@cloudflare/vite-plugin";
+
 const config = defineConfig({
 	plugins: [
-		devtools(),
-		tsconfigPaths({ projects: ["./tsconfig.json"] }),
-		tailwindcss(),
-		tanstackStart(),
-		viteReact(),
-	],
+        devtools(),
+        tsconfigPaths({ projects: ["./tsconfig.json"] }),
+        tailwindcss(),
+        tanstackStart(),
+        viteReact(),
+        cloudflare({
+            viteEnvironment: {
+                name: "ssr"
+            }
+        })
+    ],
 });
 
 export default config;
