@@ -1,6 +1,7 @@
 import { TanStackDevtools } from "@tanstack/react-devtools";
 import { createRootRoute, HeadContent, Scripts } from "@tanstack/react-router";
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
+import { PORTAL_BACKGROUND_COLOR } from "#/components/portal-background/constants";
 import { PortalBackground } from "#/components/portal-background/portal-background";
 
 import appCss from "../styles.css?url";
@@ -40,7 +41,10 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 				<HeadContent />
 			</head>
 			<body className="font-sans antialiased [overflow-wrap:anywhere]">
-				<div className="fixed inset-0 z-0">
+				<div
+					className="fixed inset-0 z-0"
+					style={{ backgroundColor: PORTAL_BACKGROUND_COLOR }}
+				>
 					<PortalBackground />
 				</div>
 				<div className="relative z-10">{children}</div>
