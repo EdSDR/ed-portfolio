@@ -12,6 +12,7 @@ import {
 	CIRCLE_LIGHTFORMERS,
 	ENVIRONMENT_HDRI_URL,
 	FLOOR_AND_WALL_COLLIDERS,
+	PORTAL_BACKGROUND_COLOR,
 } from "#/components/portal-background/constants";
 import { Letter } from "#/components/portal-background/letter";
 import { BasicSandbox } from "#/components/portal-background/sandboxes/basic-sandbox";
@@ -28,6 +29,7 @@ export function PortalBackground() {
 				dpr={[1.5, 2]}
 				camera={{ position: [-20, 40, 30], fov: 45, near: 1, far: 300 }}
 			>
+				<color attach="background" args={[PORTAL_BACKGROUND_COLOR]} />
 				<Physics gravity={[0, -60, 0]}>
 					<Letter char="P" position={[1, 50, -1]} rotation={[0, 0, 0]}>
 						<TurtleSandbox />

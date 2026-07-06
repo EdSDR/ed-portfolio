@@ -73,6 +73,7 @@ export function Letter({
 						<RenderTexture
 							attach="buffer"
 							stencilBuffer={stencilBuffer}
+							samples={stencilBuffer ? 0 : undefined}
 							width={512}
 							height={512}
 							compute={events.compute as RenderTextureProps["compute"]}
