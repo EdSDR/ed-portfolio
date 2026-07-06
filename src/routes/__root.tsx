@@ -1,6 +1,7 @@
 import { TanStackDevtools } from "@tanstack/react-devtools";
 import { createRootRoute, HeadContent, Scripts } from "@tanstack/react-router";
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
+import { PortalBackground } from "#/components/portal-background/portal-background";
 
 import appCss from "../styles.css?url";
 
@@ -39,7 +40,10 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 				<HeadContent />
 			</head>
 			<body className="font-sans antialiased [overflow-wrap:anywhere]">
-				{children}
+				<div className="fixed inset-0 z-0">
+					<PortalBackground />
+				</div>
+				<div className="relative z-10">{children}</div>
 				<TanStackDevtools
 					config={{
 						position: "bottom-right",
