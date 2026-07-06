@@ -31,7 +31,7 @@ export function AnimatedText({
 }: AnimatedTextProps) {
 	const Children = text.split(" ").map((word, index) => (
 		<motion.span
-			key={word}
+			key={`${word}-${index}`}
 			className="inline-block mr-[0.25em] whitespace-nowrap will-change-transform"
 			aria-hidden="true"
 			initial="initial"
@@ -41,9 +41,9 @@ export function AnimatedText({
 				staggerChildren: 0.025,
 			}}
 		>
-			{[...word].map((character) => (
+			{[...word].map((character, charIndex) => (
 				<motion.span
-					key={character}
+					key={`${character}-${charIndex}`}
 					className="inline-block"
 					aria-hidden="true"
 					custom={word.length}
