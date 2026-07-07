@@ -1,11 +1,6 @@
 import type { ThreeElements } from "@react-three/fiber";
 import { useFrame, useThree } from "@react-three/fiber";
-import {
-	CuboidCollider,
-	Physics,
-	type RapierRigidBody,
-	RigidBody,
-} from "@react-three/rapier";
+import { Physics, type RapierRigidBody, RigidBody } from "@react-three/rapier";
 import { useRef } from "react";
 import { Euler, Quaternion } from "three";
 
@@ -33,27 +28,21 @@ function Ball({ args = [0.75, 32, 32] }: { args?: [number, number, number] }) {
 	const { viewport } = useThree();
 	const ref = useRef<RapierRigidBody>(null);
 
+	useFrame(() => {
+		const translation = ref.current?.translation();
+		if (translation && translation.y < -viewport.height) {
+			ref.current?.setTranslation({ x: 0, y: 0, z: 0 }, true);
+			ref.current?.setLinvel({ x: 0, y: 10, z: 0 }, true);
+		}
+	});
+
 	return (
-		<>
-			<RigidBody ref={ref} colliders="ball" mass={1}>
-				<mesh>
-					<sphereGeometry args={args} />
-					<meshStandardMaterial />
-				</mesh>
-			</RigidBody>
-			<RigidBody
-				colliders={false}
-				position={[0, -viewport.height, 0]}
-				restitution={RESTITUTION}
-				type="fixed"
-				onCollisionEnter={() => {
-					ref.current?.setTranslation({ x: 0, y: 0, z: 0 }, true);
-					ref.current?.setLinvel({ x: 0, y: 10, z: 0 }, true);
-				}}
-			>
-				<CuboidCollider args={[100, 2, 100]} />
-			</RigidBody>
-		</>
+		<RigidBody ref={ref} colliders="ball" mass={1}>
+			<mesh>
+				<sphereGeometry args={args} />
+				<meshStandardMaterial />
+			</mesh>
+		</RigidBody>
 	);
 }
 

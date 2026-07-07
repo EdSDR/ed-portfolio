@@ -1,5 +1,4 @@
 import {
-	type CameraControlsImpl,
 	Center,
 	MeshTransmissionMaterial,
 	Preload,
@@ -19,6 +18,7 @@ type LetterProps = {
 	rotation: [number, number, number];
 	stencilBuffer?: boolean;
 	backgroundColor: string;
+	onSelect: (letter: Group) => void;
 	children: React.ReactNode;
 };
 
@@ -27,14 +27,12 @@ export function Letter({
 	children,
 	stencilBuffer = false,
 	backgroundColor,
+	onSelect,
 	...props
 }: LetterProps) {
 	const main = useRef<Group>(null);
 	const contents = useRef<Group>(null);
 	const events = useThree((state) => state.events);
-	const controls = useThree(
-		(state) => state.controls,
-	) as CameraControlsImpl | null;
 
 	useFrame(() => {
 		if (!main.current || !contents.current) return;
@@ -46,9 +44,9 @@ export function Letter({
 			<Center ref={main}>
 				<Text3D
 					bevelEnabled
-					onDoubleClick={(e) => {
+					onClick={(e) => {
 						e.stopPropagation();
-						if (main.current) controls?.fitToBox(main.current, true);
+						if (main.current) onSelect(main.current);
 					}}
 					font={BOLD_FONT_URL}
 					smooth={1}
@@ -64,9 +62,9 @@ export function Letter({
 					{char}
 					<MeshTransmissionMaterial
 						clearcoat={1}
-						samples={5}
-						thickness={30}
-						chromaticAberration={0.1}
+						samples={3}
+						thickness={20}
+						chromaticAberration={0.2}
 						anisotropy={0.1}
 					>
 						<RenderTexture

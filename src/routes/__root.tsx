@@ -3,6 +3,10 @@ import { createRootRoute, HeadContent, Scripts } from "@tanstack/react-router";
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
 import { PORTAL_BACKGROUND_COLOR } from "#/components/portal-background/constants";
 import { PortalBackground } from "#/components/portal-background/portal-background";
+import {
+	PortalFocusProvider,
+	usePortalFocus,
+} from "#/components/portal-background/portal-focus-context";
 
 import appCss from "../styles.css?url";
 
@@ -40,14 +44,16 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 				<script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
 				<HeadContent />
 			</head>
-			<body className="font-sans antialiased [overflow-wrap:anywhere]">
-				<div
-					className="fixed inset-0 z-0"
-					style={{ backgroundColor: PORTAL_BACKGROUND_COLOR }}
-				>
-					<PortalBackground />
-				</div>
-				<div className="relative z-10">{children}</div>
+			<body className="font-sans antialiased wrap-anywhere">
+				<PortalFocusProvider>
+					<div
+						className="fixed inset-0 z-0"
+						style={{ backgroundColor: PORTAL_BACKGROUND_COLOR }}
+					>
+						<PortalBackground />
+					</div>
+					<PageContent>{children}</PageContent>
+				</PortalFocusProvider>
 				<TanStackDevtools
 					config={{
 						position: "bottom-right",
@@ -62,5 +68,20 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 				<Scripts />
 			</body>
 		</html>
+	);
+}
+
+function PageContent({ children }: { children: React.ReactNode }) {
+	const { isFocused } = usePortalFocus();
+
+	return (
+		<div
+			className={`relative z-10 transition-opacity duration-500 ${
+				isFocused ? "opacity-0 pointer-events-none" : "opacity-100"
+			}`}
+			inert={isFocused}
+		>
+			{children}
+		</div>
 	);
 }

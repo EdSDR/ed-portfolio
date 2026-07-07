@@ -9,7 +9,11 @@ import {
 import { Canvas } from "@react-three/fiber";
 import { CuboidCollider, Physics } from "@react-three/rapier";
 import { ClientOnly } from "@tanstack/react-router";
+import { X } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
+import type { Group } from "three";
+import { Box3, Vector3 } from "three";
 import { CameraDebugPanel } from "#/components/portal-background/camera-debug-panel";
 import {
 	CAMERA_INITIAL_POSITION,
@@ -20,6 +24,7 @@ import {
 	PORTAL_BACKGROUND_COLOR,
 } from "#/components/portal-background/constants";
 import { Letter } from "#/components/portal-background/letter";
+import { usePortalFocus } from "#/components/portal-background/portal-focus-context";
 import { BasicSandbox } from "#/components/portal-background/sandboxes/basic-sandbox";
 import { PingPongSandbox } from "#/components/portal-background/sandboxes/ping-pong-sandbox";
 import { RocketSandbox } from "#/components/portal-background/sandboxes/rocket-sandbox";
@@ -27,6 +32,10 @@ import { ShoeSandbox } from "#/components/portal-background/sandboxes/shoe-sandb
 import { StencilSandbox } from "#/components/portal-background/sandboxes/stencil-sandbox";
 import { TurtleSandbox } from "#/components/portal-background/sandboxes/turtle-sandbox";
 import { SceneDebugPanel } from "#/components/portal-background/scene-debug-panel";
+
+const TOP_VIEW_EPSILON = 0.001;
+const TOP_VIEW_PADDING_FACTOR = 2.5;
+const TOP_VIEW_MIN_DISTANCE = 15;
 
 function useIdleMount() {
 	const [isIdle, setIsIdle] = useState(false);
@@ -52,6 +61,7 @@ export function PortalBackground() {
 	const [backgroundColor, setBackgroundColor] = useState(
 		PORTAL_BACKGROUND_COLOR,
 	);
+	const { isFocused, setFocused } = usePortalFocus();
 
 	const setCameraControlsRef = useCallback(
 		(instance: CameraControlsImpl | null) => {
@@ -67,6 +77,42 @@ export function PortalBackground() {
 		},
 		[],
 	);
+
+	const handleSelectLetter = useCallback((letter: Group) => {
+		const controls = cameraControlsRef.current;
+		if (!controls) return;
+
+		const box = new Box3().setFromObject(letter);
+		const center = box.getCenter(new Vector3());
+		const size = box.getSize(new Vector3());
+		const distance = Math.max(
+			Math.max(size.x, size.z) * TOP_VIEW_PADDING_FACTOR,
+			TOP_VIEW_MIN_DISTANCE,
+		);
+
+		controls.setLookAt(
+			center.x,
+			center.y + distance,
+			center.z + TOP_VIEW_EPSILON,
+			center.x,
+			center.y,
+			center.z,
+			true,
+		);
+		setFocused(true);
+	}, [setFocused]);
+
+	const handleClose = useCallback(() => {
+		const controls = cameraControlsRef.current;
+		if (controls) {
+			controls.setLookAt(
+				...CAMERA_INITIAL_POSITION,
+				...CAMERA_INITIAL_TARGET,
+				true,
+			);
+		}
+		setFocused(false);
+	}, [setFocused]);
 
 	return (
 		<ClientOnly>
@@ -101,6 +147,7 @@ export function PortalBackground() {
 								position={[1, 50, -1]}
 								rotation={[0, 0, 0]}
 								backgroundColor={backgroundColor}
+								onSelect={handleSelectLetter}
 							>
 								<TurtleSandbox />
 							</Letter>
@@ -109,6 +156,7 @@ export function PortalBackground() {
 								position={[2, 60, -2]}
 								rotation={[4, 5, 6]}
 								backgroundColor={backgroundColor}
+								onSelect={handleSelectLetter}
 							>
 								<ShoeSandbox scale={5} />
 							</Letter>
@@ -117,6 +165,7 @@ export function PortalBackground() {
 								position={[-1, 80, 3]}
 								rotation={[10, 11, 12]}
 								backgroundColor={backgroundColor}
+								onSelect={handleSelectLetter}
 							>
 								<RocketSandbox position={[-1, -1, 0]} scale={0.6} />
 							</Letter>
@@ -125,6 +174,7 @@ export function PortalBackground() {
 								position={[-1, 80, 3]}
 								rotation={[10, 11, 12]}
 								backgroundColor={backgroundColor}
+								onSelect={handleSelectLetter}
 							>
 								<BasicSandbox scale={3} />
 							</Letter> */}
@@ -133,6 +183,7 @@ export function PortalBackground() {
 								position={[-2, 90, 2]}
 								rotation={[13, 14, 15]}
 								backgroundColor={backgroundColor}
+								onSelect={handleSelectLetter}
 							>
 								<PingPongSandbox />
 							</Letter>
@@ -142,6 +193,7 @@ export function PortalBackground() {
 								rotation={[16, 17, 18]}
 								stencilBuffer
 								backgroundColor={backgroundColor}
+								onSelect={handleSelectLetter}
 							>
 								<StencilSandbox scale={2} />
 							</Letter>
@@ -201,6 +253,18 @@ export function PortalBackground() {
 						/>
 						<Preload all />
 					</Canvas>
+					{isFocused &&
+						createPortal(
+							<button
+								type="button"
+								onClick={handleClose}
+								aria-label="Close letter view"
+								className="fixed top-4 right-4 z-50 flex size-10 items-center justify-center rounded-full bg-white/80 text-stone-700 shadow-lg backdrop-blur transition-colors hover:bg-white hover:text-stone-900"
+							>
+								<X className="size-5" />
+							</button>,
+							document.body,
+						)}
 				</>
 			)}
 		</ClientOnly>
