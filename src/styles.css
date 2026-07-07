@@ -8,8 +8,8 @@
   --font-serif: "Playfair Display Variable", ui-serif, Georgia, serif;
 }
 :root {
-  --primary: #173a40;
-  --background: #e7f3ec;
+  --primary: #231F20;
+  --background: #f8f8f8;
 }
 
 :root[data-theme="dark"] {

@@ -11,16 +11,14 @@ import { useFrame, useThree } from "@react-three/fiber";
 import { RigidBody } from "@react-three/rapier";
 import { useRef } from "react";
 import type { Group } from "three";
-import {
-	BOLD_FONT_URL,
-	PORTAL_BACKGROUND_COLOR,
-} from "#/components/portal-background/constants";
+import { BOLD_FONT_URL } from "#/components/portal-background/constants";
 
 type LetterProps = {
 	char: string;
 	position: [number, number, number];
 	rotation: [number, number, number];
 	stencilBuffer?: boolean;
+	backgroundColor: string;
 	children: React.ReactNode;
 };
 
@@ -28,6 +26,7 @@ export function Letter({
 	char,
 	children,
 	stencilBuffer = false,
+	backgroundColor,
 	...props
 }: LetterProps) {
 	const main = useRef<Group>(null);
@@ -65,10 +64,10 @@ export function Letter({
 					{char}
 					<MeshTransmissionMaterial
 						clearcoat={1}
-						samples={3}
-						thickness={40}
-						chromaticAberration={0.25}
-						anisotropy={0.4}
+						samples={5}
+						thickness={30}
+						chromaticAberration={0.1}
+						anisotropy={0.1}
 					>
 						<RenderTexture
 							attach="buffer"
@@ -78,7 +77,7 @@ export function Letter({
 							height={512}
 							compute={events.compute as RenderTextureProps["compute"]}
 						>
-							<color attach="background" args={[PORTAL_BACKGROUND_COLOR]} />
+							<color attach="background" args={[backgroundColor]} />
 							<group ref={contents} matrixAutoUpdate={false}>
 								{children}
 							</group>

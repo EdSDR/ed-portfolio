@@ -143,7 +143,7 @@ function RouteComponent() {
 										target="_blank"
 										rel="noopener noreferrer"
 										aria-label={social.label}
-										className="text-stone-400 hover:text-stone-600 transition-colors"
+										className="text-stone-500 hover:text-stone-700 transition-colors"
 										initial={SOCIAL_ANIMATION.initial}
 										animate={SOCIAL_ANIMATION.animate}
 										transition={{
@@ -283,30 +283,30 @@ const ItemRow = memo(function ItemRow({
 				{isHovered ? (
 					<motion.div
 						layoutId={layoutId}
-						className="absolute inset-0 bg-stone-300/30 border border-stone-300/50 rounded-md"
+						className="absolute inset-0 bg-stone-300/40 border border-stone-300/60 rounded-md"
 						transition={ITEM_HOVER_TRANSITION}
 					/>
 				) : null}
 
 				<div className="relative flex items-baseline justify-between gap-2 sm:gap-8 w-full">
 					<div className="flex items-baseline gap-2 min-w-0">
-						<span className="font-bold text-stone-700 truncate">{label}</span>
-						<span className="text-sm text-stone-500 hidden sm:inline">
+						<span className="font-bold text-stone-800 truncate">{label}</span>
+						<span className="text-sm text-stone-600 hidden sm:inline">
 							{role}
 						</span>
 					</div>
 					{date ? (
-						<span className="text-sm text-stone-400 whitespace-nowrap hidden sm:inline">
+						<span className="text-sm text-stone-500 whitespace-nowrap hidden sm:inline">
 							{date}
 						</span>
 					) : null}
 				</div>
 
-				<span className="relative text-xs text-stone-500 sm:hidden">
+				<span className="relative text-xs text-stone-600 sm:hidden">
 					{role}
 				</span>
 
-				<span className="relative text-xs text-stone-600">{about}</span>
+				<span className="relative text-xs text-stone-700">{about}</span>
 				<img src={previewUrl} alt="" className="hidden" fetchPriority="low" />
 			</motion.div>
 		</a>

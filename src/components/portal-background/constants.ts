@@ -9,7 +9,10 @@ export const TURTLE_MODEL_URL = `${PORTAL_ASSET_BASE}/turtle-transformed.glb`;
 export const ENVIRONMENT_HDRI_URL =
 	"https://dl.polyhaven.org/file/ph-assets/HDRIs/hdr/1k/dancing_hall_1k.hdr";
 
-export const PORTAL_BACKGROUND_COLOR = "#4899c9";
+export const PORTAL_BACKGROUND_COLOR = "#f8f8f8";
+
+export const CAMERA_INITIAL_POSITION: [number, number, number] = [0, 30, 40];
+export const CAMERA_INITIAL_TARGET: [number, number, number] = [-1, 15, 0];
 
 type ColliderLayout = {
 	position: [number, number, number];
