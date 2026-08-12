@@ -63,7 +63,7 @@ const ANIMATION_STEPS = [
 	{ font: "Redaction 35", weight: 700, size: 6.5 },
 	{ font: "Redaction 100", weight: 400, size: 5.2 },
 	{ font: "Redaction 20", weight: 400, size: 4.2 },
-	{ font: "Playfair Display Variable", weight: 700, size: 3.75 },
+	{ font: "Redaction 50", weight: 700, size: 3.75 },
 ] as const satisfies Array<{
 	font: string;
 	weight: number;
@@ -133,7 +133,7 @@ function RouteComponent() {
 
 					{expanded ? (
 						<>
-							<AnimatedText text="software engineer & designer" element="p" />
+							<AnimatedText text="Software Engineer & Designer" element="p" />
 
 							<div className="flex items-center gap-2 mt-1">
 								{SOCIALS.map((social, i) => (
@@ -337,9 +337,9 @@ export default function Home() {
 	return (
 		<>
 			<AnimatedText
-				className="text-xl mt-4 font-bold font-serif"
+				className="text-xl mt-4 font-bold font-redaction"
 				element="h2"
-				text="work"
+				text="Work"
 				artificialDelay={0.3}
 			/>
 
@@ -363,9 +363,9 @@ export default function Home() {
 			</div>
 
 			<AnimatedText
-				className="text-xl mt-4 font-bold font-serif"
+				className="text-xl mt-4 font-bold font-redaction"
 				element="h2"
-				text="projects"
+				text="Projects"
 				artificialDelay={0.3}
 			/>
 

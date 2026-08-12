@@ -32,37 +32,45 @@ export const WORK_ITEMS: readonly WorkItem[] = [
 	{
 		company: "Renlabs",
 		slug: "renlabs",
-		role: "senior software engineer",
+		role: "Senior Web3 Developer & Designer",
 		date: "jul 2024 — present",
 		about:
-			"web applications and tooling for a substrate-based blockchain within the polkadot ecosystem",
+			"Substrate-based blockchain where autonomous on-chain agents interact and emissions flows.",
 		url: "https://torus.network/portal",
 	},
 	{
 		company: "Nitro Academy",
 		slug: "nitro-academy",
-		role: "senior software engineer",
+		role: "Senior Web Developer",
 		date: "feb 2024 — jul 2024",
-		about: "core software platform serving 10,000+ active users across brazil",
+		about:
+			"Complement traditional education with practical subjects and top-tier mentors",
 		url: "https://www.nitro.academy/en",
 	},
 	{
 		company: "FutureMe",
 		slug: "futureme",
-		role: "software engineer",
+		role: "Senior Web Developer & Product Designer",
 		date: "jan 2022 — jan 2024",
-		about:
-			"platform rewrite focused on performance, type safety, and ux improvements",
+		about: "Self-directed, gamified career guidance solution.",
 		url: "https://www.futureme.tech/",
 	},
 ];
 
 export const PROJECTS: readonly Project[] = [
 	{
-		name: "aifred",
+		name: "Determinate Intelligence",
+		slug: "deti",
+		role: "Senior Web Developer & Designer",
+		about:
+			"Build AI systems where correctness is enforced by machinery, not promised by a prompt.",
+		url: "https://determinate.org/",
+	},
+	{
+		name: "AIfred",
 		slug: "aifred",
-		role: "Owner & Lead Web Developer",
-		about: "AI-powered chatbot for the web",
+		role: "Web Developer",
+		about: "AI powered virtual asistant",
 		url: "https://aifred.com.br/",
 	},
 ];
