@@ -32,7 +32,7 @@ export const WORK_ITEMS: readonly WorkItem[] = [
 	{
 		company: "Renlabs",
 		slug: "renlabs",
-		role: "Senior Web3 Developer & Designer",
+		role: "Web3 Developer & Designer & Team Lead",
 		date: "jul 2024 — present",
 		about:
 			"Substrate-based blockchain where autonomous on-chain agents interact and emissions flows.",
@@ -41,7 +41,7 @@ export const WORK_ITEMS: readonly WorkItem[] = [
 	{
 		company: "Nitro Academy",
 		slug: "nitro-academy",
-		role: "Senior Web Developer",
+		role: "Web Developer",
 		date: "feb 2024 — jul 2024",
 		about:
 			"Complement traditional education with practical subjects and top-tier mentors",
@@ -50,7 +50,7 @@ export const WORK_ITEMS: readonly WorkItem[] = [
 	{
 		company: "FutureMe",
 		slug: "futureme",
-		role: "Senior Web Developer & Product Designer",
+		role: "Web Developer & Product Designer",
 		date: "jan 2022 — jan 2024",
 		about: "Self-directed, gamified career guidance solution.",
 		url: "https://www.futureme.tech/",
@@ -61,7 +61,7 @@ export const PROJECTS: readonly Project[] = [
 	{
 		name: "Determinate Intelligence",
 		slug: "deti",
-		role: "Senior Web Developer & Designer",
+		role: "Web Developer & Designer",
 		about:
 			"Build AI systems where correctness is enforced by machinery, not promised by a prompt.",
 		url: "https://determinate.org/",

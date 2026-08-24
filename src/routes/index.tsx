@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import {
 	LayoutGroup,
 	type MotionNodeAnimationOptions,
@@ -14,6 +14,7 @@ import { AnimatedText } from "#/components/animated-text";
 import { HoverPreview } from "#/components/hover-preview";
 import { GitHubIcon, LinkedInIcon, XIcon } from "#/components/icons";
 import { PROJECTS, SOCIALS, WORK_ITEMS } from "#/utils/constants";
+import { hasProjectContent, hasWorkContent } from "#/utils/content-manifest";
 import { getPreviewUrl } from "#/utils/get-preview-url";
 
 export const Route = createFileRoute("/")({
@@ -234,6 +235,15 @@ const PROJECT_PREVIEW_URLS = new Map(
 	PROJECTS.map((item) => [item.slug, getPreviewUrl(item) ?? ""]),
 );
 
+// precompute whether each item has a write-up, so we know whether to link
+// internally or fall back to the external site
+const WORK_HAS_CONTENT = new Map(
+	WORK_ITEMS.map((item) => [item.slug, hasWorkContent(item.slug)]),
+);
+const PROJECT_HAS_CONTENT = new Map(
+	PROJECTS.map((item) => [item.slug, hasProjectContent(item.slug)]),
+);
+
 type ItemRowProps = {
 	id: string;
 	label: string;
@@ -241,6 +251,9 @@ type ItemRowProps = {
 	about: string;
 	date?: string;
 	url: string;
+	slug: string;
+	routeId: "/work/$slug" | "/projects/$slug";
+	hasContent: boolean;
 	isHovered: boolean;
 	layoutId: string;
 	delay: number;
@@ -255,6 +268,9 @@ const ItemRow = memo(function ItemRow({
 	about,
 	date,
 	url,
+	slug,
+	routeId,
+	hasContent,
 	isHovered,
 	layoutId,
 	delay,
@@ -268,47 +284,53 @@ const ItemRow = memo(function ItemRow({
 		[onHover, id, previewUrl],
 	);
 
-	return (
-		<a href={url} target="_blank" rel="noopener noreferrer">
-			<motion.div
-				className="relative flex flex-col items-start will-change-transform -mx-2 px-2 -my-1 py-1 text-left"
-				initial={ITEM_ANIMATION.initial}
-				animate={ITEM_ANIMATION.animate}
-				transition={{
-					...ITEM_ANIMATION.transition,
-					delay,
-				}}
-				onMouseEnter={handleMouseEnter}
-			>
-				{isHovered ? (
-					<motion.div
-						layoutId={layoutId}
-						className="absolute inset-0 bg-stone-300/30 border border-stone-300/50 rounded-md"
-						transition={ITEM_HOVER_TRANSITION}
-					/>
-				) : null}
+	const rowContent = (
+		<motion.div
+			className="relative flex flex-col items-start will-change-transform -mx-2 px-2 -my-1 py-1 text-left"
+			initial={ITEM_ANIMATION.initial}
+			animate={ITEM_ANIMATION.animate}
+			transition={{
+				...ITEM_ANIMATION.transition,
+				delay,
+			}}
+			onMouseEnter={handleMouseEnter}
+		>
+			{isHovered ? (
+				<motion.div
+					layoutId={layoutId}
+					className="absolute inset-0 bg-stone-300/30 border border-stone-300/50 rounded-md"
+					transition={ITEM_HOVER_TRANSITION}
+				/>
+			) : null}
 
-				<div className="relative flex items-baseline justify-between gap-2 sm:gap-8 w-full">
-					<div className="flex items-baseline gap-2 min-w-0">
-						<span className="font-bold text-[#44403C] truncate">{label}</span>
-						<span className="text-sm text-[#44403C] hidden sm:inline">
-							{role}
-						</span>
-					</div>
-					{date ? (
-						<span className="text-sm text-[#44403C] whitespace-nowrap hidden sm:inline">
-							{date}
-						</span>
-					) : null}
+			<div className="relative flex items-baseline justify-between gap-2 sm:gap-8 w-full">
+				<div className="flex items-baseline gap-2 min-w-0">
+					<span className="font-bold text-[#44403C] truncate">{label}</span>
+					<span className="text-sm text-[#44403C] hidden sm:inline">
+						{role}
+					</span>
 				</div>
+				{date ? (
+					<span className="text-sm text-[#44403C] whitespace-nowrap hidden sm:inline">
+						{date}
+					</span>
+				) : null}
+			</div>
 
-				<span className="relative text-xs text-[#44403C] sm:hidden">
-					{role}
-				</span>
+			<span className="relative text-xs text-[#44403C] sm:hidden">{role}</span>
 
-				<span className="relative text-xs text-[#44403C]">{about}</span>
-				<img src={previewUrl} alt="" className="hidden" fetchPriority="low" />
-			</motion.div>
+			<span className="relative text-xs text-[#44403C]">{about}</span>
+			<img src={previewUrl} alt="" className="hidden" fetchPriority="low" />
+		</motion.div>
+	);
+
+	return hasContent ? (
+		<Link to={routeId} params={{ slug }}>
+			{rowContent}
+		</Link>
+	) : (
+		<a href={url} target="_blank" rel="noopener noreferrer">
+			{rowContent}
 		</a>
 	);
 });
@@ -353,6 +375,9 @@ export default function Home() {
 						about={item.about}
 						date={item.date}
 						url={item.url}
+						slug={item.slug}
+						routeId="/work/$slug"
+						hasContent={WORK_HAS_CONTENT.get(item.slug) ?? false}
 						isHovered={hoveredWork?.id === item.company}
 						layoutId="work-hover"
 						delay={0.5 + i * 0.15}
@@ -382,6 +407,9 @@ export default function Home() {
 						role={project.role}
 						about={project.about}
 						url={project.url}
+						slug={project.slug}
+						routeId="/projects/$slug"
+						hasContent={PROJECT_HAS_CONTENT.get(project.slug) ?? false}
 						isHovered={hoveredProject?.id === project.name}
 						layoutId="project-hover"
 						delay={0.5 + i * 0.15}

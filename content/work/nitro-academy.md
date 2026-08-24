@@ -1,0 +1,7 @@
+I was brought in as the solo developer to build Nitro Academy's online platform from zero. In five months, I took it from nothing to a live product serving over 10,000 students.
+
+**What Nitro Academy does:** Nitro Academy is a Brazilian edtech accelerator for young talents aged 13–17. It complements traditional education with practical, real-world subjects tailored to what students are actually interested in — the kind of skills school doesn't usually teach.
+
+**My role:** There was no existing platform and no team — just me. I owned the entire build end to end: architecture, backend, frontend, and the administration tooling professors and staff would depend on daily. Everything shipped in a five-month window, from first commit to a platform actively serving students.
+
+**Core features I built:** The platform had two sides that had to work in lockstep. On the student side: video classes with attached discussion sections, live chat, and direct chat with professors — the real-time backbone of the whole product. On the administration side: a dashboard that let administrators and professors dynamically build and manage content, so new classes and material could go live without needing an engineer involved. I also built authentication from scratch to support both student and staff access. Owning every layer of a platform like this solo — and getting it in front of 10,000+ real students in under half a year — is the thing I'm most proud of from this role.
