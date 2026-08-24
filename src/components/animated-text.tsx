@@ -21,6 +21,7 @@ type AnimatedTextProps = {
 	element: "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "p" | "span";
 	className?: string;
 	artificialDelay?: number;
+	skipAnimation?: boolean;
 };
 
 export function AnimatedText({
@@ -28,13 +29,14 @@ export function AnimatedText({
 	className,
 	text,
 	artificialDelay,
+	skipAnimation,
 }: AnimatedTextProps) {
 	const Children = text.split(" ").map((word, index) => (
 		<motion.span
 			key={`${word}-${index}`}
 			className="inline-block mr-[0.25em] whitespace-nowrap will-change-transform"
 			aria-hidden="true"
-			initial="initial"
+			initial={skipAnimation ? false : "initial"}
 			animate="animate"
 			transition={{
 				delayChildren: index * 0.25 + (artificialDelay ?? 0),

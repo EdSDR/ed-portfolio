@@ -6,10 +6,18 @@ import {
 	type Transition,
 	useMotionValue,
 	useMotionValueEvent,
+	usePageInView,
 	useSpring,
 	useTransform,
 } from "motion/react";
-import { memo, useCallback, useEffect, useRef, useState } from "react";
+import {
+	memo,
+	useCallback,
+	useEffect,
+	useLayoutEffect,
+	useRef,
+	useState,
+} from "react";
 import { AnimatedText } from "#/components/animated-text";
 import { HoverPreview } from "#/components/hover-preview";
 import { GitHubIcon, LinkedInIcon, XIcon } from "#/components/icons";
@@ -32,6 +40,10 @@ const NAME_SPRING_CONFIG = {
 	damping: 15,
 	mass: 3,
 } as const satisfies Transition;
+
+// Module-scoped, not persisted: resets on every full page load/reload, but
+// survives client-side navigation away from and back to this route.
+let hasPlayedIntro = false;
 
 const SOCIAL_ANIMATION = {
 	initial: {
@@ -79,7 +91,10 @@ function RouteComponent() {
 	const ref = useRef<HTMLHeadingElement>(null);
 	const progress = useMotionValue(0);
 	const spring = useSpring(progress, NAME_SPRING_CONFIG);
+	const skippedRef = useRef(false);
 	const [expanded, setExpanded] = useState(false);
+	const [skipIntro, setSkipIntro] = useState(false);
+	const isPageVisible = usePageInView();
 
 	const fontSize = useTransform(spring, STEP_INDICES, STEP_SIZES);
 	const fontSizeRem = useTransform(
@@ -110,9 +125,50 @@ function RouteComponent() {
 		}
 	});
 
+	// Runs before paint so a repeat visit never flashes the pre-intro state.
+	useLayoutEffect(() => {
+		if (hasPlayedIntro) {
+			skippedRef.current = true;
+			setSkipIntro(true);
+			setExpanded(true);
+			spring.jump(LAST_STEP);
+			progress.jump(LAST_STEP);
+			if (ref.current) {
+				const last = ANIMATION_STEPS[LAST_STEP];
+				ref.current.style.setProperty(
+					"font-family",
+					`"${last.font}"`,
+					"important",
+				);
+				ref.current.style.setProperty(
+					"font-weight",
+					String(last.weight),
+					"important",
+				);
+			}
+			return;
+		}
+
+		hasPlayedIntro = true;
+	}, [progress, spring]);
+
 	useEffect(() => {
+		if (skippedRef.current) {
+			return;
+		}
+
 		progress.set(LAST_STEP);
 	}, [progress]);
+
+	// Pause/resume the spring's own underlying animation on tab visibility
+	// change, instead of letting a backgrounded rAF loop leave it stuck.
+	useEffect(() => {
+		if (isPageVisible) {
+			spring.animation?.play();
+		} else {
+			spring.animation?.pause();
+		}
+	}, [isPageVisible, spring]);
 
 	return (
 		<motion.div className="flex flex-1 justify-center px-6 py-[15vh] overflow-y-auto overflow-hidden">
@@ -134,7 +190,11 @@ function RouteComponent() {
 
 					{expanded ? (
 						<>
-							<AnimatedText text="Software Engineer & Designer" element="p" />
+							<AnimatedText
+								text="Software Engineer & Designer"
+								element="p"
+								skipAnimation={skipIntro}
+							/>
 
 							<div className="flex items-center gap-2 mt-1">
 								{SOCIALS.map((social, i) => (
@@ -145,7 +205,7 @@ function RouteComponent() {
 										rel="noopener noreferrer"
 										aria-label={social.label}
 										className="text-stone-400 hover:text-stone-600 transition-colors"
-										initial={SOCIAL_ANIMATION.initial}
+										initial={skipIntro ? false : SOCIAL_ANIMATION.initial}
 										animate={SOCIAL_ANIMATION.animate}
 										transition={{
 											...SOCIAL_ANIMATION.transition,
@@ -157,7 +217,7 @@ function RouteComponent() {
 								))}
 							</div>
 
-							<Home />
+							<Home skipIntro={skipIntro} />
 						</>
 					) : null}
 
@@ -258,6 +318,7 @@ type ItemRowProps = {
 	layoutId: string;
 	delay: number;
 	previewUrl: string;
+	skipIntro: boolean;
 	onHover: (id: string, previewUrl: string, rect: DOMRect) => void;
 };
 
@@ -275,6 +336,7 @@ const ItemRow = memo(function ItemRow({
 	layoutId,
 	delay,
 	previewUrl,
+	skipIntro,
 	onHover,
 }: ItemRowProps) {
 	const handleMouseEnter = useCallback(
@@ -287,7 +349,7 @@ const ItemRow = memo(function ItemRow({
 	const rowContent = (
 		<motion.div
 			className="relative flex flex-col items-start will-change-transform -mx-2 px-2 -my-1 py-1 text-left"
-			initial={ITEM_ANIMATION.initial}
+			initial={skipIntro ? false : ITEM_ANIMATION.initial}
 			animate={ITEM_ANIMATION.animate}
 			transition={{
 				...ITEM_ANIMATION.transition,
@@ -335,7 +397,7 @@ const ItemRow = memo(function ItemRow({
 	);
 });
 
-export default function Home() {
+export default function Home({ skipIntro }: { skipIntro: boolean }) {
 	const [hoveredWork, setHoveredWork] = useState<HoverState>(null);
 	const [hoveredProject, setHoveredProject] = useState<HoverState>(null);
 
@@ -363,6 +425,7 @@ export default function Home() {
 				element="h2"
 				text="Work"
 				artificialDelay={0.3}
+				skipAnimation={skipIntro}
 			/>
 
 			<div className="flex flex-col gap-3 mt-3" onMouseLeave={clearWorkHover}>
@@ -382,6 +445,7 @@ export default function Home() {
 						layoutId="work-hover"
 						delay={0.5 + i * 0.15}
 						previewUrl={WORK_PREVIEW_URLS.get(item.slug) ?? ""}
+						skipIntro={skipIntro}
 						onHover={handleWorkHover}
 					/>
 				))}
@@ -392,6 +456,7 @@ export default function Home() {
 				element="h2"
 				text="Projects"
 				artificialDelay={0.3}
+				skipAnimation={skipIntro}
 			/>
 
 			<button
@@ -414,6 +479,7 @@ export default function Home() {
 						layoutId="project-hover"
 						delay={0.5 + i * 0.15}
 						previewUrl={PROJECT_PREVIEW_URLS.get(project.slug) ?? ""}
+						skipIntro={skipIntro}
 						onHover={handleProjectHover}
 					/>
 				))}
