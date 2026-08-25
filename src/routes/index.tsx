@@ -171,7 +171,7 @@ function RouteComponent() {
 	}, [isPageVisible, spring]);
 
 	return (
-		<motion.div className="flex flex-1 justify-center px-6 py-[15vh] overflow-y-auto overflow-hidden">
+		<motion.div className="flex flex-1 justify-center px-6 py-[15vh] overflow-y-auto overflow-x-hidden">
 			<LayoutGroup>
 				<motion.div
 					layout
