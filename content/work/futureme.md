@@ -1,5 +1,3 @@
-**Software Engineer** · Jan 2022 – Jan 2024 (2 years) · Remote, Brazil
-
 I joined FutureMe as an intern when the platform was still in its early days — just a handful of basic activities live, everything else still to be built. Two years later I left as the engineer who had rewritten its core architecture, shipped its flagship product feature, and mentored the next wave of interns coming up behind me.
 
 ![FutureMe](/previews/futureme.png)
