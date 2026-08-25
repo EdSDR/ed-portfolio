@@ -1,4 +1,9 @@
-import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import {
+	createFileRoute,
+	Link,
+	notFound,
+	redirect,
+} from "@tanstack/react-router";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { PROJECTS } from "#/utils/constants";
@@ -7,10 +12,15 @@ import { getProjectMarkdown } from "#/utils/content";
 export const Route = createFileRoute("/projects/$slug")({
 	loader: ({ params }) => {
 		const item = PROJECTS.find((p) => p.slug === params.slug);
-		const markdown = item ? getProjectMarkdown(item.slug) : undefined;
 
-		if (!item || markdown === undefined) {
+		if (!item) {
 			throw notFound();
+		}
+
+		const markdown = getProjectMarkdown(item.slug);
+
+		if (markdown === undefined) {
+			throw redirect({ href: item.url });
 		}
 
 		return { item, markdown };
