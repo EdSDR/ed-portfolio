@@ -44,7 +44,7 @@ export const WORK_ITEMS: readonly WorkItem[] = [
 		role: "Web Developer",
 		date: "feb 2024 — jul 2024",
 		about:
-			"Complement traditional education with practical subjects and top-tier mentors",
+			"Complement traditional education with practical subjects and top-tier mentors.",
 		url: "https://www.nitro.academy/en",
 	},
 	{
@@ -65,6 +65,21 @@ export const PROJECTS: readonly Project[] = [
 		about:
 			"Build AI systems where correctness is enforced by machinery, not promised by a prompt.",
 		url: "https://determinate.org/",
+	},
+	{
+		name: "Higher Order Company",
+		slug: "hoc",
+		role: "Web Developer",
+		about: "Parallel computation.",
+		url: "https://higherorderco.com/",
+	},
+	{
+		name: "Enlaza",
+		slug: "enlaza",
+		role: "Web Developer",
+		about:
+			"Medical, legal, and more: protecting the well-being of individuals and families at every moment.",
+		url: "https://www.enlazaconmigo.com/",
 	},
 	{
 		name: "AIfred",

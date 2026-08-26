@@ -39,33 +39,36 @@ export function HoverPreview({
 	// `transform` on any ancestor turns it into the containing block for
 	// fixed descendants, which breaks the top/left math and can extend the
 	// page's scrollable area, producing a stray scrollbar mid-animation.
-	return (
+	//
+	// The portal wraps `AnimatePresence` (not the other way around):
+	// `AnimatePresence` doesn't recognize a React Portal as a valid child and
+	// silently fails to render it, so the conditional content must live
+	// *inside* the portaled subtree instead.
+	return createPortal(
 		<AnimatePresence>
-			{isVisible
-				? createPortal(
-						<motion.div
-							layoutId="hover-preview"
-							className="w-96 fixed z-50 pointer-events-none overflow-hidden rounded-lg border border-stone-300/50 shadow-lg bg-stone-200"
-							style={{
-								top: anchorRect.top,
-								left: anchorRect.right + 12,
-								willChange: "transform, opacity, filter",
-							}}
-							initial={PREVIEW_TRANSITION.initial}
-							animate={PREVIEW_TRANSITION.animate}
-							exit={PREVIEW_TRANSITION.initial}
-							transition={PREVIEW_TRANSITION}
-						>
-							<img
-								key={previewUrl}
-								src={previewUrl}
-								alt=""
-								className="w-full block aspect-16/9 object-cover"
-							/>
-						</motion.div>,
-						document.body,
-					)
-				: null}
-		</AnimatePresence>
+			{isVisible ? (
+				<motion.div
+					layoutId="hover-preview"
+					className="w-96 fixed z-50 pointer-events-none overflow-hidden rounded-lg border border-stone-300/50 shadow-lg bg-stone-200"
+					style={{
+						top: anchorRect.top,
+						left: anchorRect.right + 12,
+						willChange: "transform, opacity, filter",
+					}}
+					initial={PREVIEW_TRANSITION.initial}
+					animate={PREVIEW_TRANSITION.animate}
+					exit={PREVIEW_TRANSITION.initial}
+					transition={PREVIEW_TRANSITION}
+				>
+					<img
+						key={previewUrl}
+						src={previewUrl}
+						alt=""
+						className="w-full block aspect-video object-cover"
+					/>
+				</motion.div>
+			) : null}
+		</AnimatePresence>,
+		document.body,
 	);
 }
